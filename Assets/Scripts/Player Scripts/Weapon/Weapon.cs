@@ -91,7 +91,7 @@ public class Weapon : MonoBehaviour
 
     void Shoot()
     {
-        int clip = UnityEngine.Random.Range(0, wo.shootAudio.Length);
+        int clip = UnityEngine.Random.Range(0, wo.shootAudio.Length - 1);
         audio.PlayOneShot(wo.shootAudio[clip]);
     }
     #endregion
