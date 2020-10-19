@@ -19,7 +19,9 @@ public class WeaponObject : ScriptableObject
     [Header("Weapon Spread")]
     public float minSpread;
     public float maxSpread;
-    public float spreadResetTime;
+    public float spreadAddedPerShot;
+    [Tooltip("Spread recovered per second")]
+    public float spreadRecoverySpeed;
     [Header("Reload & Ammo")]
     public float reloadTime;
     [Tooltip("Number of bullets in magazine")]

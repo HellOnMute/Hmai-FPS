@@ -4,9 +4,9 @@
 TagManager:
   serializedVersion: 2
   tags:
-  - Bullet
   - ChatListContainer
   - ChatListInput
+  - PlayerEyes
   layers:
   - Default
   - TransparentFX

@@ -13,19 +13,19 @@ MonoBehaviour:
   m_Name: TestGun
   m_EditorClassIdentifier: 
   WeaponName: Test Gun
-  oneHanded: 0
+  oneHanded: 1
   fireRate: 0
   singleShot: 1
   canAim: 1
   aimSpeed: 0.1
   minDamage: 5
   maxDamage: 20
-  minSpread: 0
-  maxSpread: 0
-  spreadResetTime: 0
+  minSpread: 0.8
+  maxSpread: 3
+  spreadResetTime: 1.8
   reloadTime: 2
   magSize: 8
-  magAmount: 3
+  magAmount: 100
   weaponPrefab: {fileID: 4134122579731375273, guid: f01cce34c2fc90c49a09f4c95f94aa31,
     type: 3}
   shootAnimation: {fileID: 0}
