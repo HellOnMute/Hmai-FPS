@@ -1,0 +1,39 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f1561b99028b277408f4a787c60836d1, type: 3}
+  m_Name: TestGun
+  m_EditorClassIdentifier: 
+  WeaponName: Test Gun
+  oneHanded: 0
+  fireRate: 0
+  singleShot: 1
+  canAim: 1
+  aimSpeed: 0.1
+  minDamage: 5
+  maxDamage: 20
+  minSpread: 0
+  maxSpread: 0
+  spreadResetTime: 0
+  reloadTime: 2
+  magSize: 8
+  magAmount: 3
+  weaponPrefab: {fileID: 4134122579731375273, guid: f01cce34c2fc90c49a09f4c95f94aa31,
+    type: 3}
+  shootAnimation: {fileID: 0}
+  reloadAnimation: {fileID: 0}
+  shootAudio:
+  - {fileID: 8300000, guid: 0d9f85d9ea69a734895afc382b692db2, type: 3}
+  - {fileID: 8300000, guid: fae95b73a7d8253448ab7311a06badf7, type: 3}
+  - {fileID: 8300000, guid: 6627c2b7c9dcb2349b21c06ef7969c8e, type: 3}
+  - {fileID: 8300000, guid: 07fdadc77bdcdbf488a3e0de14db6c40, type: 3}
+  reloadAudio: []
+  outOfAmmoAudio: {fileID: 8300000, guid: 326d68ddc8b9e2f45b547fd58528b7d9, type: 3}
