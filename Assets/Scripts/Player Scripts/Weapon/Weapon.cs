@@ -4,8 +4,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using Random = UnityEngine.Random;
 using TMPro; // remove later
+using Photon.Pun;
 
-public class Weapon : MonoBehaviour
+public class Weapon : MonoBehaviourPunCallbacks
 {
     [SerializeField]
     TextMeshProUGUI txt; // Remove later
@@ -13,6 +14,8 @@ public class Weapon : MonoBehaviour
     WeaponObject wo;
     [SerializeField]
     GameObject bulletHolePrefab;
+    [SerializeField]
+    Transform playerCamera;
 
     int currentMag;
     int totalAmmoLeft;
@@ -23,7 +26,7 @@ public class Weapon : MonoBehaviour
     bool canShoot = false;
 
     Transform weaponTransform, hipTransform, unequippedTransform;
-    Transform playerCamera;
+    
     AudioSource audio;
 
     float timeSinceLastShot = 0f;
@@ -31,6 +34,9 @@ public class Weapon : MonoBehaviour
 
     void Start()
     {
+        if (!photonView.IsMine)
+            return;
+
         currentMag = wo.magSize;
         totalAmmoLeft = wo.magSize * wo.magAmount - wo.magSize;
         maxAmmo = wo.magSize * wo.magAmount;
@@ -40,7 +46,7 @@ public class Weapon : MonoBehaviour
         unequippedTransform = gameObject.transform.Find("Unequipped");
 
         audio = GetComponent<AudioSource>();
-        playerCamera = GameObject.FindGameObjectWithTag("PlayerEyes").transform; // Refactor?
+        //playerCamera = GameObject.FindGameObjectWithTag("PlayerEyes").transform; // Refactor?
 
         currentSpread = wo.minSpread;
 
@@ -49,6 +55,9 @@ public class Weapon : MonoBehaviour
     float timez = 0;
     void Update()
     {
+        if (!photonView.IsMine)
+            return;
+
         if (isEquipping)
             EquipWeapon();
         if (!isEquipped)
@@ -64,12 +73,14 @@ public class Weapon : MonoBehaviour
 
         CalculateSpreadValue();
 
-        //txt.text = $"{currentMag}/{totalAmmoLeft}";
-
-        //timez += wo.spreadRecoverySpeed * Time.deltaTime;
-        //txt.text = (timez).ToString();
-
-        txt.text = currentSpread.ToString();
+        if (Input.GetKeyDown(KeyCode.Y))
+        {
+            var b = GameObject.FindGameObjectsWithTag("Respawn");
+            foreach (var item in b)
+            {
+                Destroy(item);
+            }
+        }
     }
 
     #region Equip
@@ -104,7 +115,7 @@ public class Weapon : MonoBehaviour
         {
             if (currentMag > 0)
             {
-                Shoot();
+                photonView.RPC("Shoot", RpcTarget.All);
                 currentMag--;
             }
             else
@@ -115,6 +126,7 @@ public class Weapon : MonoBehaviour
         }
     }
 
+    [PunRPC]
     void Shoot()
     {
         int clip = UnityEngine.Random.Range(0, wo.shootAudio.Length - 1);
@@ -130,14 +142,18 @@ public class Weapon : MonoBehaviour
             GameObject bulletHole = Instantiate(bulletHolePrefab, hit.point + hit.normal * 0.001f, Quaternion.identity);
             bulletHole.transform.LookAt(hit.point + hit.normal);
             //Destroy(bulletHole, 8f);
+
+            if (photonView.IsMine)
+            {
+                // if we hit a player...
+                // rpc call damage to that player!
+            }
         }
     }
 
     void CalculateSpreadValue()
     {
-        //currentSpread = Mathf.Lerp(wo.maxSpread, wo.minSpread, wo.spreadRecoverySpeed * Time.deltaTime);
         currentSpread = Mathf.MoveTowards(currentSpread, wo.minSpread, wo.spreadRecoverySpeed * Time.deltaTime);
-        Debug.Log(currentSpread);
 
         timeSinceLastShot += Time.deltaTime;
     }

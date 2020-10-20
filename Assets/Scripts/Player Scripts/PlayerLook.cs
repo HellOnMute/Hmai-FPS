@@ -10,12 +10,11 @@ public class PlayerLook : MonoBehaviour
     [SerializeField]
     float xSensitivity, ySensitivity, maxAngle;
 
-    Quaternion camCenter, eyesModelCenter;
+    Quaternion camCenter;
 
     void Start()
     {
         camCenter = eyeCam.localRotation;
-        eyesModelCenter = eyeCam.localRotation; // Destroy if local?
     }
     
     void Update()

@@ -1,44 +1,80 @@
-﻿using System;
+﻿using Photon.Pun;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerMotion : MonoBehaviour
+public class PlayerController : MonoBehaviour
 {
     [SerializeField]
-    float speed, sprintModifier, jumpForce;
+    float speed, sprintModifier, jumpForce, mouseSensitivity, maxVerticalAngle;
     [SerializeField]
     Camera eyeCam;
     [SerializeField]
-    Transform groundCheck;
+    Transform hands, groundCheck;
 
-    Rigidbody rb;
     float baseFOV;
     float sprintFOVModifier = 1.25f;
 
+    float verticalLookRotation;
     bool isGrounded = false;
+
+    PhotonView pv;
+    Rigidbody rb;
+
+    void Awake()
+    {
+        rb = GetComponent<Rigidbody>();
+        pv = GetComponent<PhotonView>();
+        baseFOV = eyeCam.fieldOfView;
+
+        //Cursor.lockState = CursorLockMode.Locked;
+    }
 
     void Start()
     {
-        Camera.main.enabled = false;
-        rb = GetComponent<Rigidbody>();
-        baseFOV = eyeCam.fieldOfView;
+        if (!pv.IsMine)
+        {
+            Destroy(GetComponentInChildren<Camera>().gameObject);
+            Destroy(rb);
+        }
+        else
+        {
+            GetComponentInChildren<Sway>().enabled = pv.IsMine;
+        }
     }
 
     private void Update()
     {
+        if (!pv.IsMine)
+            return;
+
         Jump();
+        Look();
         CheckGrounded();
     }
 
     private void FixedUpdate()
     {
+        if (!pv.IsMine)
+            return;
+
         Move();
     }
 
     private void CheckGrounded()
     {
         isGrounded = Physics.Raycast(groundCheck.position, Vector3.down, 0.2f);
+    }
+
+    void Look()
+    {
+        transform.Rotate(Vector3.up * Input.GetAxisRaw("Mouse X") * mouseSensitivity);
+        verticalLookRotation += Input.GetAxisRaw("Mouse Y") * mouseSensitivity;
+        verticalLookRotation = Mathf.Clamp(verticalLookRotation, -maxVerticalAngle, maxVerticalAngle);
+
+        eyeCam.transform.localEulerAngles = Vector3.left * verticalLookRotation;
+        hands.transform.localEulerAngles = Vector3.left * verticalLookRotation;
     }
 
     void Move()

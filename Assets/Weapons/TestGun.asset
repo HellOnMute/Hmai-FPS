@@ -20,9 +20,10 @@ MonoBehaviour:
   aimSpeed: 0.1
   minDamage: 5
   maxDamage: 20
-  minSpread: 0.8
-  maxSpread: 3
-  spreadResetTime: 1.8
+  minSpread: 0.6
+  maxSpread: 6
+  spreadAddedPerShot: 1.8
+  spreadRecoverySpeed: 3
   reloadTime: 2
   magSize: 8
   magAmount: 100
