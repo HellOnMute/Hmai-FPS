@@ -9,13 +9,11 @@ using Photon.Pun;
 public class Weapon : MonoBehaviourPunCallbacks
 {
     [SerializeField]
-    TextMeshProUGUI txt; // Remove later
-    [SerializeField]
     WeaponObject wo;
     [SerializeField]
     GameObject bulletHolePrefab;
     [SerializeField]
-    Transform playerCamera;
+    Transform cameraHolder, guntip, gunAudioPosition;
 
     int currentMag;
     int totalAmmoLeft;
@@ -27,13 +25,16 @@ public class Weapon : MonoBehaviourPunCallbacks
 
     Transform weaponTransform, hipTransform, unequippedTransform;
     
-    AudioSource audio;
-
+    AudioSource guntipAudio, gunAudio;
     float timeSinceLastShot = 0f;
     float currentSpread;
 
     void Start()
     {
+        gunAudio = gunAudioPosition.GetComponent<AudioSource>();
+        guntipAudio = guntip.GetComponent<AudioSource>();
+        cameraHolder = transform.root.Find("CameraHolder");
+
         if (!photonView.IsMine)
             return;
 
@@ -45,14 +46,13 @@ public class Weapon : MonoBehaviourPunCallbacks
         hipTransform = gameObject.transform.Find("Hip");
         unequippedTransform = gameObject.transform.Find("Unequipped");
 
-        audio = GetComponent<AudioSource>();
-        //playerCamera = GameObject.FindGameObjectWithTag("PlayerEyes").transform; // Refactor?
-
         currentSpread = wo.minSpread;
 
         Equip();
+
+        Cursor.lockState = CursorLockMode.Locked; // Fix
     }
-    float timez = 0;
+    
     void Update()
     {
         if (!photonView.IsMine)
@@ -73,7 +73,7 @@ public class Weapon : MonoBehaviourPunCallbacks
 
         CalculateSpreadValue();
 
-        if (Input.GetKeyDown(KeyCode.Y))
+        if (Input.GetKeyDown(KeyCode.Y)) // Remove later
         {
             var b = GameObject.FindGameObjectsWithTag("Respawn");
             foreach (var item in b)
@@ -81,6 +81,11 @@ public class Weapon : MonoBehaviourPunCallbacks
                 Destroy(item);
             }
         }
+
+        if (Input.GetKeyDown(KeyCode.Escape)) // FIX
+            Cursor.lockState = CursorLockMode.None;
+        if (Input.GetMouseButtonDown(0))
+            Cursor.lockState = CursorLockMode.Locked;
     }
 
     #region Equip
@@ -115,39 +120,29 @@ public class Weapon : MonoBehaviourPunCallbacks
         {
             if (currentMag > 0)
             {
-                photonView.RPC("Shoot", RpcTarget.All);
+                Shoot();
                 currentMag--;
             }
             else
             {
                 if (wo.outOfAmmoAudio != null)
-                    audio.PlayOneShot(wo.outOfAmmoAudio);
+                    photonView.RPC("OutOfAmmoSound", RpcTarget.All);
             }
         }
     }
 
-    [PunRPC]
     void Shoot()
     {
-        int clip = UnityEngine.Random.Range(0, wo.shootAudio.Length - 1);
-        audio.PlayOneShot(wo.shootAudio[clip]);
-
-        var spread = CalculateWeaponSpread();
         timeSinceLastShot = 0f;
-        currentSpread = Mathf.Clamp(currentSpread + wo.spreadAddedPerShot, wo.minSpread, wo.maxSpread);
+        var spread = CalculateWeaponSpread();
+
+        photonView.RPC("NetworkShootEffects", RpcTarget.All);
 
         RaycastHit hit;
-        if (Physics.Raycast(playerCamera.position, spread, out hit, 100f))
+        if (Physics.Raycast(cameraHolder.position, spread, out hit, 100f))
         {
             GameObject bulletHole = Instantiate(bulletHolePrefab, hit.point + hit.normal * 0.001f, Quaternion.identity);
             bulletHole.transform.LookAt(hit.point + hit.normal);
-            //Destroy(bulletHole, 8f);
-
-            if (photonView.IsMine)
-            {
-                // if we hit a player...
-                // rpc call damage to that player!
-            }
         }
     }
 
@@ -160,12 +155,13 @@ public class Weapon : MonoBehaviourPunCallbacks
 
     Vector3 CalculateWeaponSpread()
     {
-        //var currentSpread = Mathf.Clamp()
-        var spread = playerCamera.position + playerCamera.forward * 100f;
+        var spread = cameraHolder.position + cameraHolder.forward * 100f;
         spread += Random.Range(-currentSpread, currentSpread) * Vector3.right;
         spread += Random.Range(-currentSpread, currentSpread) * Vector3.up;
-        spread -= playerCamera.position;
+        spread -= cameraHolder.position;
         spread.Normalize();
+
+        currentSpread = Mathf.Clamp(currentSpread + wo.spreadAddedPerShot, wo.minSpread, wo.maxSpread);
 
         return spread;
     }
@@ -199,4 +195,24 @@ public class Weapon : MonoBehaviourPunCallbacks
             weaponTransform.position = Vector3.Lerp(weaponTransform.position, hipTransform.position, Time.deltaTime / wo.aimSpeed);
         }
     }
+
+    #region PunRPC
+    [PunRPC]
+    void OutOfAmmoSound()
+    {
+        gunAudio.clip = wo.outOfAmmoAudio;
+        gunAudio.Play();
+    }
+
+    [PunRPC]
+    void NetworkShootEffects()
+    {
+        int clip = UnityEngine.Random.Range(0, wo.shootAudio.Length - 1);
+        guntipAudio.clip = wo.shootAudio[clip];
+        guntipAudio.Play();
+
+        // Particle effect, muzzleflash
+    }
+
+    #endregion
 }

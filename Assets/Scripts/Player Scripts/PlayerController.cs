@@ -4,7 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerController : MonoBehaviour
+public class PlayerController : MonoBehaviour, IPunObservable
 {
     [SerializeField]
     float speed, sprintModifier, jumpForce, mouseSensitivity, maxVerticalAngle;
@@ -18,9 +18,14 @@ public class PlayerController : MonoBehaviour
 
     float verticalLookRotation;
     bool isGrounded = false;
-
+    float horizontal, vertical;
+    bool isSprinting = false;
     PhotonView pv;
     Rigidbody rb;
+
+    // Network vectors
+    Vector3 networkPosition = Vector3.zero;
+    Quaternion networkRotation = Quaternion.identity;
 
     void Awake()
     {
@@ -36,7 +41,6 @@ public class PlayerController : MonoBehaviour
         if (!pv.IsMine)
         {
             Destroy(GetComponentInChildren<Camera>().gameObject);
-            Destroy(rb);
         }
         else
         {
@@ -52,15 +56,26 @@ public class PlayerController : MonoBehaviour
         Jump();
         Look();
         CheckGrounded();
+
+        horizontal = Input.GetAxisRaw("Horizontal");
+        vertical = Input.GetAxisRaw("Vertical");
+
+        isSprinting = Sprinting(vertical);
     }
 
     private void FixedUpdate()
     {
         if (!pv.IsMine)
-            return;
-
-        Move();
+        {
+            transform.position = Vector3.MoveTowards(rb.position, networkPosition, Time.fixedDeltaTime);
+            transform.rotation = Quaternion.RotateTowards(rb.rotation, networkRotation, Time.fixedDeltaTime * 100.0f);
+        }
+        else
+        {
+            Move();
+        }
     }
+
 
     private void CheckGrounded()
     {
@@ -73,17 +88,31 @@ public class PlayerController : MonoBehaviour
         verticalLookRotation += Input.GetAxisRaw("Mouse Y") * mouseSensitivity;
         verticalLookRotation = Mathf.Clamp(verticalLookRotation, -maxVerticalAngle, maxVerticalAngle);
 
-        eyeCam.transform.localEulerAngles = Vector3.left * verticalLookRotation;
+        eyeCam.transform.parent.localEulerAngles = Vector3.left * verticalLookRotation;
         hands.transform.localEulerAngles = Vector3.left * verticalLookRotation;
     }
 
-    void Move()
+    public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
     {
-        float horizontal = Input.GetAxisRaw("Horizontal");
-        float vertical = Input.GetAxisRaw("Vertical");
+        if (stream.IsWriting)
+        {
+            stream.SendNext(rb.position);
+            stream.SendNext(rb.rotation);
+            stream.SendNext(rb.velocity);
+        }
+        else
+        {
+            networkPosition = (Vector3)stream.ReceiveNext();
+            networkRotation = (Quaternion)stream.ReceiveNext();
+            rb.velocity = (Vector3)stream.ReceiveNext();
 
-        bool isSprinting = Sprinting(vertical);
-        
+            float lag = Mathf.Abs((float)(PhotonNetwork.Time - info.SentServerTime));
+            networkPosition += (rb.velocity * lag);
+        }
+    }
+
+    void Move() // Local move
+    {
         Vector3 direction = new Vector3(horizontal, 0f, vertical).normalized;
         direction = transform.TransformDirection(direction) * speed * (isSprinting ? sprintModifier : 1) * Time.deltaTime;
         direction.y = rb.velocity.y;
@@ -111,5 +140,4 @@ public class PlayerController : MonoBehaviour
 
         return sprinting;
     }
-
 }
