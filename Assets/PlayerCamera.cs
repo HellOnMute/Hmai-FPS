@@ -12,6 +12,8 @@ public class PlayerCamera : MonoBehaviourPun
     Camera eyeCam;
     [SerializeField]
     Transform hands;
+    [SerializeField]
+    GameObject playerModel;
 
     float verticalLookRotation;
     float baseFOV;
@@ -26,7 +28,20 @@ public class PlayerCamera : MonoBehaviourPun
         }
         else
         {
+            // REFACTOR
+            gameObject.layer = 9;
+            hands.gameObject.SetActive(true);// REFACTOR CURRENT HANDS SETUP
             GetComponentInChildren<Sway>().enabled = photonView.IsMine;
+            for (int i = 0; i < playerModel.transform.childCount; i++)
+            {
+                playerModel.transform.GetChild(i).gameObject.layer = 8;
+
+                // There'll only ever be max 2 nested layers..
+                for (int j = 0; i < playerModel.transform.GetChild(i).childCount; i++)
+                {
+                    playerModel.transform.GetChild(i).GetChild(j).gameObject.layer = 8;
+                }
+            }
         }
     }
 

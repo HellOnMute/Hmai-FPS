@@ -7,6 +7,7 @@ public class WeaponObject : ScriptableObject
 {
     public string WeaponName;
     public bool oneHanded;
+    public bool IsUnlocked;
     [Header("Handling")]
     public float fireRate;
     public bool singleShot;
@@ -28,10 +29,8 @@ public class WeaponObject : ScriptableObject
     public int magSize;
     [Tooltip("Number of magazines (-1 for infinite)")]
     public int magAmount;
-    [Header("Model & Animations")]
-    public GameObject weaponPrefab;
-    public AnimationClip shootAnimation;
-    public AnimationClip reloadAnimation;
+    [Header("Effects")]
+    public ParticleSystem muzzleFlash;
     [Header("Sound")]
     public AudioClip[] shootAudio;
     public AudioClip[] reloadAudio;

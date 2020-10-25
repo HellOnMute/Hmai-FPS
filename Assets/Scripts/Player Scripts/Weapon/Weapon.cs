@@ -6,7 +6,7 @@ using Random = UnityEngine.Random;
 using TMPro; // remove later
 using Photon.Pun;
 
-public class Weapon : MonoBehaviourPunCallbacks
+public class Weapon : MonoBehaviourPun
 {
     [SerializeField]
     WeaponObject wo;
@@ -18,23 +18,20 @@ public class Weapon : MonoBehaviourPunCallbacks
     int currentMag;
     int totalAmmoLeft;
     int maxAmmo;
-
-    bool isEquipped = false;
-    bool isEquipping = false;
-    bool canShoot = false;
-
-    Transform weaponTransform, hipTransform, unequippedTransform;
     
     AudioSource guntipAudio, gunAudio;
+    ParticleSystem muzzleFlash;
     float timeSinceLastShot = 0f;
     float currentSpread;
+
+    public WeaponObject GetWeaponObject => wo;
 
     void Start()
     {
         gunAudio = gunAudioPosition.GetComponent<AudioSource>();
         guntipAudio = guntip.GetComponent<AudioSource>();
         cameraHolder = transform.root.Find("CameraHolder");
-
+        muzzleFlash = guntip.GetComponent<ParticleSystem>();
         if (!photonView.IsMine)
             return;
 
@@ -42,13 +39,7 @@ public class Weapon : MonoBehaviourPunCallbacks
         totalAmmoLeft = wo.magSize * wo.magAmount - wo.magSize;
         maxAmmo = wo.magSize * wo.magAmount;
 
-        weaponTransform = gameObject.transform.Find("Weapon");
-        hipTransform = gameObject.transform.Find("Hip");
-        unequippedTransform = gameObject.transform.Find("Unequipped");
-
         currentSpread = wo.minSpread;
-
-        Equip();
 
         Cursor.lockState = CursorLockMode.Locked; // Fix
     }
@@ -57,14 +48,6 @@ public class Weapon : MonoBehaviourPunCallbacks
     {
         if (!photonView.IsMine)
             return;
-
-        if (isEquipping)
-            EquipWeapon();
-        if (!isEquipped)
-            return;
-
-        if (canShoot)
-            Shooting();
 
         Aim();
 
@@ -88,39 +71,19 @@ public class Weapon : MonoBehaviourPunCallbacks
             Cursor.lockState = CursorLockMode.Locked;
     }
 
-    #region Equip
     public void Equip()
     {
-        isEquipping = true;
-        canShoot = false;
-        weaponTransform.localRotation = unequippedTransform.localRotation;
+        Debug.Log("Equipped " + this.name);
     }
-
-    public void Unequip()
-    {
-        isEquipped = false;
-        canShoot = false;
-    }
-
-    private void EquipWeapon()
-    {
-        weaponTransform.localRotation = Quaternion.Lerp(weaponTransform.localRotation, hipTransform.localRotation, Time.deltaTime / 0.05f);
-        if (weaponTransform.localRotation == hipTransform.localRotation)
-        {
-            canShoot = true;
-            isEquipped = true;
-        }
-    }
-    #endregion
 
     #region Shooting
-    void Shooting()
+    public void Shoot()
     {
         if ((Input.GetMouseButton(0) && !wo.singleShot) || Input.GetMouseButtonDown(0))
         {
             if (currentMag > 0)
             {
-                Shoot();
+                DoShoot();
                 currentMag--;
             }
             else
@@ -131,7 +94,7 @@ public class Weapon : MonoBehaviourPunCallbacks
         }
     }
 
-    void Shoot()
+    void DoShoot()
     {
         timeSinceLastShot = 0f;
         var spread = CalculateWeaponSpread();
@@ -139,10 +102,11 @@ public class Weapon : MonoBehaviourPunCallbacks
         photonView.RPC("NetworkShootEffects", RpcTarget.All);
 
         RaycastHit hit;
-        if (Physics.Raycast(cameraHolder.position, spread, out hit, 100f))
+        if (Physics.Raycast(cameraHolder.position, spread, out hit, 100f, 9))
         {
-            GameObject bulletHole = Instantiate(bulletHolePrefab, hit.point + hit.normal * 0.001f, Quaternion.identity);
-            bulletHole.transform.LookAt(hit.point + hit.normal);
+            Debug.Log(hit.transform.name);
+            //GameObject bulletHole = Instantiate(bulletHolePrefab, hit.point + hit.normal * 0.001f, Quaternion.identity);
+            //bulletHole.transform.LookAt(hit.point + hit.normal);
         }
     }
 
@@ -182,17 +146,10 @@ public class Weapon : MonoBehaviourPunCallbacks
     {
         if (!wo.canAim)
             return;
-        
-        Transform aim = gameObject.transform.Find("Aim");
 
         if (Input.GetMouseButton(1))
         {
-            weaponTransform.position = Vector3.Lerp(weaponTransform.position, aim.position, Time.deltaTime / wo.aimSpeed);
-            // Add camera for sights?
-        }
-        else
-        {
-            weaponTransform.position = Vector3.Lerp(weaponTransform.position, hipTransform.position, Time.deltaTime / wo.aimSpeed);
+            Debug.Log("AIM");
         }
     }
 
@@ -210,7 +167,7 @@ public class Weapon : MonoBehaviourPunCallbacks
         int clip = UnityEngine.Random.Range(0, wo.shootAudio.Length - 1);
         guntipAudio.clip = wo.shootAudio[clip];
         guntipAudio.Play();
-
+        muzzleFlash.Play();
         // Particle effect, muzzleflash
     }
 

@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   WeaponName: Test Gun
   oneHanded: 1
+  IsUnlocked: 1
   fireRate: 0
   singleShot: 1
   canAim: 1

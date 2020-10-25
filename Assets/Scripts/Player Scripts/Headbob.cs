@@ -1,8 +1,9 @@
-﻿using System.Collections;
+﻿using Photon.Pun;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Headbob : MonoBehaviour
+public class Headbob : MonoBehaviourPun
 {
     [SerializeField]
     Transform objectToBob;
@@ -19,6 +20,14 @@ public class Headbob : MonoBehaviour
 
     Vector3 objectToBobOrigin;
     Vector3 targetBobPosition;
+
+    private void Awake()
+    {
+        if (!photonView.IsMine)
+        {
+            Destroy(this);
+        }
+    }
     void Start()
     {
         objectToBobOrigin = objectToBob.localPosition;
