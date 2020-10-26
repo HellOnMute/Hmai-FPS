@@ -11,6 +11,11 @@ public class WeaponObject : ScriptableObject
     [Header("Handling")]
     public float fireRate;
     public bool singleShot;
+    [Header("Recoil & Kickback")]
+    public float recoilStrength;
+    public float recoilRecoverySpeed;
+    public float kickbackStrength;
+    public float kickbackRecoverySpeed;
     [Header("Aiming")]
     public bool canAim;
     public float aimSpeed;

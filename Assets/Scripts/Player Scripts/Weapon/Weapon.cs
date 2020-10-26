@@ -13,7 +13,7 @@ public class Weapon : MonoBehaviourPun
     [SerializeField]
     GameObject bulletHolePrefab;
     [SerializeField]
-    Transform cameraHolder, guntip, gunAudioPosition;
+    Transform cameraHolder, guntip, gunAudioPosition, weaponVisuals, hipPosition, aimPosition, equipPosition;
 
     int currentMag;
     int totalAmmoLeft;
@@ -23,6 +23,8 @@ public class Weapon : MonoBehaviourPun
     ParticleSystem muzzleFlash;
     float timeSinceLastShot = 0f;
     float currentSpread;
+
+    public bool IsAiming { get; set; } = false;
 
     public WeaponObject GetWeaponObject => wo;
 
@@ -46,6 +48,8 @@ public class Weapon : MonoBehaviourPun
     
     void Update()
     {
+        ResetWeaponTransform();
+
         if (!photonView.IsMine)
             return;
 
@@ -69,6 +73,14 @@ public class Weapon : MonoBehaviourPun
             Cursor.lockState = CursorLockMode.None;
         if (Input.GetMouseButtonDown(0))
             Cursor.lockState = CursorLockMode.Locked;
+
+        Debug.Log(weaponVisuals.localPosition);
+    }
+
+    void ResetWeaponTransform()
+    {
+        weaponVisuals.localRotation = Quaternion.Lerp(weaponVisuals.localRotation, Quaternion.identity, Time.deltaTime * wo.recoilRecoverySpeed);
+        weaponVisuals.localPosition = Vector3.Lerp(weaponVisuals.localPosition, new Vector3(weaponVisuals.localPosition.x, weaponVisuals.localPosition.y, 0f), Time.deltaTime * wo.kickbackRecoverySpeed);
     }
 
     public void Equip()
@@ -149,7 +161,13 @@ public class Weapon : MonoBehaviourPun
 
         if (Input.GetMouseButton(1))
         {
-            Debug.Log("AIM");
+            IsAiming = true; // REFACTOR MAYBE
+            weaponVisuals.position = Vector3.Lerp(weaponVisuals.position, aimPosition.position, Time.deltaTime * wo.aimSpeed);
+        }
+        else
+        {
+            IsAiming = false;
+            weaponVisuals.position = Vector3.Lerp(weaponVisuals.position, hipPosition.position, Time.deltaTime * wo.aimSpeed);
         }
     }
 
@@ -168,7 +186,9 @@ public class Weapon : MonoBehaviourPun
         guntipAudio.clip = wo.shootAudio[clip];
         guntipAudio.Play();
         muzzleFlash.Play();
-        // Particle effect, muzzleflash
+
+        weaponVisuals.Rotate(Mathf.Clamp(-wo.recoilStrength, -wo.recoilStrength * 2, 0), 0, 0);
+        weaponVisuals.localPosition -= Vector3.forward * wo.kickbackStrength;
     }
 
     #endregion

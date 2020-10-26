@@ -17,8 +17,12 @@ MonoBehaviour:
   IsUnlocked: 1
   fireRate: 0
   singleShot: 1
+  recoilStrength: 10
+  recoilRecoverySpeed: 5
+  kickbackStrength: 0.1
+  kickbackRecoverySpeed: 10
   canAim: 1
-  aimSpeed: 0.1
+  aimSpeed: 20
   minDamage: 5
   maxDamage: 20
   minSpread: 0.6
@@ -28,10 +32,7 @@ MonoBehaviour:
   reloadTime: 2
   magSize: 8
   magAmount: 100
-  weaponPrefab: {fileID: 4134122579731375273, guid: f01cce34c2fc90c49a09f4c95f94aa31,
-    type: 3}
-  shootAnimation: {fileID: 0}
-  reloadAnimation: {fileID: 0}
+  muzzleFlash: {fileID: 0}
   shootAudio:
   - {fileID: 8300000, guid: 0d9f85d9ea69a734895afc382b692db2, type: 3}
   - {fileID: 8300000, guid: fae95b73a7d8253448ab7311a06badf7, type: 3}

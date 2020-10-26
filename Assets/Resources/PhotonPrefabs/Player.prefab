@@ -471,6 +471,38 @@ MonoBehaviour:
   m_SynchronizePosition: 1
   m_SynchronizeRotation: 1
   m_SynchronizeScale: 0
+--- !u!1 &2220213963755727115
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 9101250614122194260}
+  m_Layer: 0
+  m_Name: Visuals
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &9101250614122194260
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2220213963755727115}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children:
+  - {fileID: 70477066749547093}
+  - {fileID: 8010122225348845969}
+  m_Father: {fileID: 8319344371961186605}
+  m_RootOrder: 1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2772595467489653764
 GameObject:
   m_ObjectHideFlags: 0
@@ -5282,6 +5314,36 @@ ParticleSystemRenderer:
   m_Mesh2: {fileID: 0}
   m_Mesh3: {fileID: 0}
   m_MaskInteraction: 0
+--- !u!1 &3314762137522227680
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4947792225092293501}
+  m_Layer: 0
+  m_Name: Aim
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4947792225092293501
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3314762137522227680}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -0.253, y: 0.105, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 8319344371961186605}
+  m_RootOrder: 3
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &3589339202261640482
 GameObject:
   m_ObjectHideFlags: 0
@@ -5529,6 +5591,36 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!1 &6010231384554873034
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 713992450098756708}
+  m_Layer: 0
+  m_Name: Hip
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &713992450098756708
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6010231384554873034}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 8319344371961186605}
+  m_RootOrder: 2
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &7069406986829002677
 GameObject:
   m_ObjectHideFlags: 0
@@ -5581,6 +5673,10 @@ MonoBehaviour:
   cameraHolder: {fileID: 339181058512649349}
   guntip: {fileID: 4404214610061836797}
   gunAudioPosition: {fileID: 2137972104831504513}
+  weaponVisuals: {fileID: 0}
+  hipPosition: {fileID: 0}
+  aimPosition: {fileID: 0}
+  equipPosition: {fileID: 0}
 --- !u!114 &5969146279420758167
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5791,10 +5887,10 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8010122225348845970}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.16000004, z: 0.128}
+  m_LocalPosition: {x: 0, y: 0.16000004, z: 0.18}
   m_LocalScale: {x: 0.040000003, y: 0.040000003, z: 0.040000003}
   m_Children: []
-  m_Father: {fileID: 8319344371961186605}
+  m_Father: {fileID: 9101250614122194260}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!198 &9154498135090262045
@@ -10723,7 +10819,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 8319344371961186605}
-  m_RootOrder: 2
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!82 &596036344
 AudioSource:
@@ -10847,12 +10943,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8319344371961186604}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.379, y: 0.179, z: 0.448}
+  m_LocalPosition: {x: 0.253, y: 0.179, z: 0.448}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
-  - {fileID: 70477066749547093}
-  - {fileID: 8010122225348845969}
   - {fileID: 8319344370595249983}
+  - {fileID: 9101250614122194260}
+  - {fileID: 713992450098756708}
+  - {fileID: 4947792225092293501}
   m_Father: {fileID: 7169564864184951779}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -10873,6 +10970,10 @@ MonoBehaviour:
   cameraHolder: {fileID: 339181058512649349}
   guntip: {fileID: 8010122225348845969}
   gunAudioPosition: {fileID: 8319344370595249983}
+  weaponVisuals: {fileID: 9101250614122194260}
+  hipPosition: {fileID: 713992450098756708}
+  aimPosition: {fileID: 4947792225092293501}
+  equipPosition: {fileID: 0}
 --- !u!114 &5347329228610538941
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -10948,7 +11049,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &8564375068163474976
 Transform:
   m_ObjectHideFlags: 0
@@ -11163,7 +11264,7 @@ Camera:
     height: 1
   near clip plane: 0.01
   far clip plane: 1000
-  field of view: 60
+  field of view: 47.2
   orthographic: 0
   orthographic size: 5
   m_Depth: -2
@@ -11284,7 +11385,7 @@ PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
-    m_TransformParent: {fileID: 8319344371961186605}
+    m_TransformParent: {fileID: 9101250614122194260}
     m_Modifications:
     - target: {fileID: -927199367670048503, guid: ce247de39b8a17f4691c61f550030714,
         type: 3}
