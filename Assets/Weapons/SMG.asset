@@ -1,0 +1,41 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f1561b99028b277408f4a787c60836d1, type: 3}
+  m_Name: SMG
+  m_EditorClassIdentifier: 
+  WeaponName: SMG
+  oneHanded: 1
+  IsUnlocked: 1
+  fireRate: 0.09
+  singleShot: 0
+  recoilStrength: 3
+  recoilRecoverySpeed: 5
+  kickbackStrength: 0.1
+  kickbackRecoverySpeed: 10
+  canAim: 1
+  aimSpeed: 17
+  minDamage: 10
+  maxDamage: 20
+  minSpread: 1.2
+  maxSpread: 8
+  spreadAddedPerShot: 1.5
+  spreadRecoverySpeed: 5
+  reloadTime: 2
+  magSize: 30
+  magAmount: 180
+  muzzleFlash: {fileID: 0}
+  shootAudio:
+  - {fileID: 8300000, guid: 7628aadaa0631b34ba23c628912e2c94, type: 3}
+  - {fileID: 8300000, guid: 7ecfbea2cd6c14f46976064d675deabf, type: 3}
+  - {fileID: 8300000, guid: 4ee55a490a13d7046aeb1ffdc56a096b, type: 3}
+  reloadAudio: []
+  outOfAmmoAudio: {fileID: 8300000, guid: 0fd6522ec5603044dac9d869d4d130d0, type: 3}

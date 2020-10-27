@@ -25,8 +25,8 @@ public class WeaponHandler : MonoBehaviourPun
 
         SwitchWeapon();
 
-        if (Input.GetMouseButtonDown(0))
-            currentWeaponScript.Shoot();
+        // If can shoot state
+        currentWeaponScript.Shoot();
     }
 
     List<GameObject> GetUnlockedWeapons()

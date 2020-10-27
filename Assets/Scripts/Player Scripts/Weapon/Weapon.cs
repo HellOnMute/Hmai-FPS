@@ -11,15 +11,17 @@ public class Weapon : MonoBehaviourPun
     [SerializeField]
     WeaponObject wo;
     [SerializeField]
-    GameObject bulletHolePrefab;
+    GameObject bulletHolePrefab, playerHitFXPrefab;
     [SerializeField]
-    Transform cameraHolder, guntip, gunAudioPosition, weaponVisuals, hipPosition, aimPosition, equipPosition;
+    Transform cameraHolder, guntip, weaponVisuals, hipPosition, aimPosition, equipPosition;
+    [SerializeField]
+    AudioSource guntipAudio, gunAudio;
 
     int currentMag;
     int totalAmmoLeft;
     int maxAmmo;
     
-    AudioSource guntipAudio, gunAudio;
+    //AudioSource guntipAudio, gunAudio;
     ParticleSystem muzzleFlash;
     float timeSinceLastShot = 0f;
     float currentSpread;
@@ -30,8 +32,8 @@ public class Weapon : MonoBehaviourPun
 
     void Start()
     {
-        gunAudio = gunAudioPosition.GetComponent<AudioSource>();
-        guntipAudio = guntip.GetComponent<AudioSource>();
+        //gunAudio = gunAudioPosition.GetComponent<AudioSource>();
+        //guntipAudio = guntip.GetComponent<AudioSource>();
         cameraHolder = transform.root.Find("CameraHolder");
         muzzleFlash = guntip.GetComponent<ParticleSystem>();
         if (!photonView.IsMine)
@@ -60,21 +62,10 @@ public class Weapon : MonoBehaviourPun
 
         CalculateSpreadValue();
 
-        if (Input.GetKeyDown(KeyCode.Y)) // Remove later
-        {
-            var b = GameObject.FindGameObjectsWithTag("Respawn");
-            foreach (var item in b)
-            {
-                Destroy(item);
-            }
-        }
-
         if (Input.GetKeyDown(KeyCode.Escape)) // FIX
             Cursor.lockState = CursorLockMode.None;
         if (Input.GetMouseButtonDown(0))
             Cursor.lockState = CursorLockMode.Locked;
-
-        Debug.Log(weaponVisuals.localPosition);
     }
 
     void ResetWeaponTransform()
@@ -85,30 +76,33 @@ public class Weapon : MonoBehaviourPun
 
     public void Equip()
     {
-        Debug.Log("Equipped " + this.name);
+        weaponVisuals.localPosition = equipPosition.localPosition;
     }
 
     #region Shooting
     public void Shoot()
     {
-        if ((Input.GetMouseButton(0) && !wo.singleShot) || Input.GetMouseButtonDown(0))
+        if ((Input.GetMouseButton(0) && !wo.singleShot && wo.fireRate <= timeSinceLastShot) || Input.GetMouseButtonDown(0))
         {
             if (currentMag > 0)
             {
                 DoShoot();
                 currentMag--;
+                timeSinceLastShot = 0;
             }
             else
             {
-                if (wo.outOfAmmoAudio != null)
+                if (wo.outOfAmmoAudio != null && ((!wo.singleShot && wo.fireRate * 2 <= timeSinceLastShot) || wo.singleShot))
+                {
                     photonView.RPC("OutOfAmmoSound", RpcTarget.All);
+                    timeSinceLastShot = 0;                    
+                }                    
             }
         }
     }
 
     void DoShoot()
     {
-        timeSinceLastShot = 0f;
         var spread = CalculateWeaponSpread();
 
         photonView.RPC("NetworkShootEffects", RpcTarget.All);
@@ -116,9 +110,8 @@ public class Weapon : MonoBehaviourPun
         RaycastHit hit;
         if (Physics.Raycast(cameraHolder.position, spread, out hit, 100f, 9))
         {
-            Debug.Log(hit.transform.name);
-            //GameObject bulletHole = Instantiate(bulletHolePrefab, hit.point + hit.normal * 0.001f, Quaternion.identity);
-            //bulletHole.transform.LookAt(hit.point + hit.normal);
+
+            photonView.RPC("NetworkHitEffects", RpcTarget.All, hit.transform.tag == "Player", hit.point, hit.normal);
         }
     }
 
@@ -189,6 +182,21 @@ public class Weapon : MonoBehaviourPun
 
         weaponVisuals.Rotate(Mathf.Clamp(-wo.recoilStrength, -wo.recoilStrength * 2, 0), 0, 0);
         weaponVisuals.localPosition -= Vector3.forward * wo.kickbackStrength;
+    }
+
+    [PunRPC]
+    void NetworkHitEffects(bool hitPlayer, Vector3 hitPoint, Vector3 hitNormal)
+    {
+        if (!hitPlayer)
+        {
+            GameObject bulletHole = Instantiate(bulletHolePrefab, hitPoint + hitNormal * 0.001f, Quaternion.identity);
+            bulletHole.transform.LookAt(hitPoint + hitNormal);
+        }
+        else
+        {
+            GameObject bulletHole = Instantiate(playerHitFXPrefab, hitPoint + hitNormal * 0.001f, Quaternion.identity);
+            bulletHole.transform.LookAt(hitPoint + hitNormal);
+        }
     }
 
     #endregion
