@@ -22,7 +22,7 @@ MonoBehaviour:
   kickbackStrength: 0.1
   kickbackRecoverySpeed: 10
   canAim: 1
-  aimSpeed: 17
+  aimSpeed: 12
   minDamage: 10
   maxDamage: 20
   minSpread: 1.2
@@ -30,6 +30,7 @@ MonoBehaviour:
   spreadAddedPerShot: 1.5
   spreadRecoverySpeed: 5
   reloadTime: 2
+  reloadAnimation: {fileID: 0}
   magSize: 30
   magAmount: 180
   muzzleFlash: {fileID: 0}

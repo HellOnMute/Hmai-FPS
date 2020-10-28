@@ -30,6 +30,7 @@ public class WeaponObject : ScriptableObject
     public float spreadRecoverySpeed;
     [Header("Reload & Ammo")]
     public float reloadTime;
+    public AnimationClip reloadAnimation;
     [Tooltip("Number of bullets in magazine")]
     public int magSize;
     [Tooltip("Number of magazines (-1 for infinite)")]

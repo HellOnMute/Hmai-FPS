@@ -30,6 +30,7 @@ MonoBehaviour:
   spreadAddedPerShot: 1.8
   spreadRecoverySpeed: 3
   reloadTime: 2
+  reloadAnimation: {fileID: 7400000, guid: 69259295c964be6459d032397b1594de, type: 2}
   magSize: 8
   magAmount: 100
   muzzleFlash: {fileID: 0}

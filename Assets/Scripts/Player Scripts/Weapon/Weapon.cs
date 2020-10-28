@@ -25,10 +25,14 @@ public class Weapon : MonoBehaviourPun
     ParticleSystem muzzleFlash;
     float timeSinceLastShot = 0f;
     float currentSpread;
+    Animation anim;
 
     public bool IsAiming { get; set; } = false;
+    public bool IsReloading { get; set; } = false;
 
     public WeaponObject GetWeaponObject => wo;
+
+    PlayerState state;
 
     void Start()
     {
@@ -36,8 +40,11 @@ public class Weapon : MonoBehaviourPun
         //guntipAudio = guntip.GetComponent<AudioSource>();
         cameraHolder = transform.root.Find("CameraHolder");
         muzzleFlash = guntip.GetComponent<ParticleSystem>();
+        anim = GetComponent<Animation>();
         if (!photonView.IsMine)
             return;
+
+        state = transform.root.gameObject.GetComponent<PlayerState>();
 
         currentMag = wo.magSize;
         totalAmmoLeft = wo.magSize * wo.magAmount - wo.magSize;
@@ -56,6 +63,7 @@ public class Weapon : MonoBehaviourPun
             return;
 
         Aim();
+        SetPlayerStates();
 
         if (Input.GetKeyDown(KeyCode.R)) // Refactor
             Reload();
@@ -68,6 +76,14 @@ public class Weapon : MonoBehaviourPun
             Cursor.lockState = CursorLockMode.Locked;
     }
 
+    private void SetPlayerStates()
+    {
+        state.IsAiming = IsAiming;
+        state.IsReloading = IsReloading;
+        state.CurrentAmmo = currentMag;
+        state.CurrentAmmoReserve = totalAmmoLeft;
+    }
+
     void ResetWeaponTransform()
     {
         weaponVisuals.localRotation = Quaternion.Lerp(weaponVisuals.localRotation, Quaternion.identity, Time.deltaTime * wo.recoilRecoverySpeed);
@@ -76,12 +92,25 @@ public class Weapon : MonoBehaviourPun
 
     public void Equip()
     {
+        StartCoroutine(EquipRoutine());
+    }
+
+    IEnumerator EquipRoutine()
+    {
+        state.CanChangeWeapon = false;
         weaponVisuals.localPosition = equipPosition.localPosition;
+
+        yield return new WaitForSeconds(.4f);
+
+        state.CanChangeWeapon = true;
     }
 
     #region Shooting
     public void Shoot()
     {
+        if (IsReloading)
+            return;
+
         if ((Input.GetMouseButton(0) && !wo.singleShot && wo.fireRate <= timeSinceLastShot) || Input.GetMouseButtonDown(0))
         {
             if (currentMag > 0)
@@ -140,11 +169,36 @@ public class Weapon : MonoBehaviourPun
     {
         if (totalAmmoLeft <= 0)
             return;
+        
+        bool hasAnim = wo.reloadAnimation != null;
+        float wait = hasAnim ? wo.reloadAnimation.length : wo.reloadTime;
+
+        StartCoroutine(ReloadAnim(wait, hasAnim));
+    }
+
+    IEnumerator ReloadAnim(float wait, bool hasAnimation)
+    {
+        if (IsAiming)
+        {
+            IsReloading = true;
+            yield return new WaitForSeconds(.2f);
+        }
+
+        IsReloading = true;
+
+        if (anim != null && hasAnimation)
+        {
+            anim.clip = wo.reloadAnimation;
+            anim.Play();
+        }
         totalAmmoLeft += currentMag;
+
+        yield return new WaitForSeconds(wait);
 
         currentMag = 0;
         currentMag += totalAmmoLeft - wo.magSize >= 0 ? wo.magSize : totalAmmoLeft;
         totalAmmoLeft -= currentMag;
+        IsReloading = false;
     }
 
     void Aim()
@@ -152,7 +206,7 @@ public class Weapon : MonoBehaviourPun
         if (!wo.canAim)
             return;
 
-        if (Input.GetMouseButton(1))
+        if (Input.GetMouseButton(1) && !IsReloading)
         {
             IsAiming = true; // REFACTOR MAYBE
             weaponVisuals.position = Vector3.Lerp(weaponVisuals.position, aimPosition.position, Time.deltaTime * wo.aimSpeed);

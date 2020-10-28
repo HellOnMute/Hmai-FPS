@@ -19,6 +19,8 @@ public class PlayerCamera : MonoBehaviourPun
     float baseFOV;
     float sprintFOVModifier = 1.25f;
 
+    PlayerState state;
+
     void Start()
     {
         baseFOV = eyeCam.fieldOfView;
@@ -28,9 +30,11 @@ public class PlayerCamera : MonoBehaviourPun
         }
         else
         {
+            state = transform.root.gameObject.GetComponent<PlayerState>();
+
             // REFACTOR
-            gameObject.layer = 9;
-            hands.gameObject.SetActive(true);// REFACTOR CURRENT HANDS SETUP
+            gameObject.layer = 9; // Local player
+            //hands.gameObject.SetActive(true);// REFACTOR CURRENT HANDS SETUP
             GetComponentInChildren<Sway>().enabled = photonView.IsMine;
             for (int i = 0; i < playerModel.transform.childCount; i++)
             {

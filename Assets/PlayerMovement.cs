@@ -15,15 +15,22 @@ public class PlayerMovement : MonoBehaviour, IPunObservable
     PhotonView pv;
     Animator anim;
 
+    bool isSprinting = false;
+
     // Network vectors
     Vector3 networkPosition = Vector3.zero;
     Quaternion networkRotation = Quaternion.identity;
+
+    PlayerState state;
 
     void Start()
     {
         pv = GetComponent<PhotonView>();
         controller = GetComponent<CharacterController>();
         anim = GetComponent<Animator>();
+
+        if (pv.IsMine)
+            state = GetComponent<PlayerState>();
     }
 
     void Update()
@@ -36,7 +43,15 @@ public class PlayerMovement : MonoBehaviour, IPunObservable
         else
         {
             Move();
+            SetPlayerState();
         }        
+    }
+
+    private void SetPlayerState()
+    {
+        state.IsMoving = moveDirection.x > 0 || moveDirection.y > 0;
+        state.IsSprinting = isSprinting;
+        state.IsGrounded = controller.isGrounded;
     }
 
     void Move()
@@ -54,10 +69,20 @@ public class PlayerMovement : MonoBehaviour, IPunObservable
             moveDirection = transform.TransformDirection(moveDirection);
         }
 
-        Jump();        
+        if (state.CanMove)
+        {
+            Jump();
 
-        moveDirection.y -= gravity * Time.deltaTime;
-        controller.Move(moveDirection * Time.deltaTime);
+            moveDirection.y -= gravity * Time.deltaTime;
+            controller.Move(moveDirection * Time.deltaTime);
+        }
+        else
+        {
+            Vector3 grav = Vector3.zero;
+            grav.y -= gravity * Time.deltaTime;
+            controller.Move(grav * Time.deltaTime);
+        }
+        
     }
 
     [PunRPC]
@@ -76,7 +101,8 @@ public class PlayerMovement : MonoBehaviour, IPunObservable
 
     bool IsSprinting(float inputY)
     {
-        return Input.GetKey(KeyCode.LeftShift) && inputY > 0;
+        isSprinting = Input.GetKey(KeyCode.LeftShift) && inputY > 0 && state.CanSprint;
+        return isSprinting;
     }
 
     public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)

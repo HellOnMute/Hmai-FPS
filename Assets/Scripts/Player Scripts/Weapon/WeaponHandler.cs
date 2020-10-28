@@ -12,10 +12,14 @@ public class WeaponHandler : MonoBehaviourPun
     Weapon currentWeaponScript;
     int currentWeaponIndex = 0;
 
+    PlayerState state;
     private void Start()
     {
         unlockedWeapons = GetUnlockedWeapons();
         photonView.RPC("SetCurrentWeapon", RpcTarget.All, currentWeaponIndex);
+
+        if (photonView.IsMine)
+            state = transform.root.gameObject.GetComponent<PlayerState>();
     }
 
     private void Update()
@@ -84,7 +88,7 @@ public class WeaponHandler : MonoBehaviourPun
 
     void SwitchWeapon()
     {
-        if (unlockedWeapons.Count <= 1)
+        if (unlockedWeapons.Count <= 1 || !state.CanChangeWeapon)
             return;
 
         if (Input.GetAxisRaw("Mouse ScrollWheel") > 0)
