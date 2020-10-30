@@ -8,6 +8,8 @@ TagManager:
   - ChatListInput
   - CameraHolder
   - PlayerEyes
+  - AmmoTxt
+  - HPTxt
   layers:
   - Default
   - TransparentFX

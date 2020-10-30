@@ -34,10 +34,14 @@ public class Weapon : MonoBehaviourPun
 
     PlayerState state;
 
+    private void Awake()
+    {
+        if (photonView.IsMine)
+            state = transform.root.gameObject.GetComponent<PlayerState>();
+    }
+
     void Start()
     {
-        //gunAudio = gunAudioPosition.GetComponent<AudioSource>();
-        //guntipAudio = guntip.GetComponent<AudioSource>();
         cameraHolder = transform.root.Find("CameraHolder");
         muzzleFlash = guntip.GetComponent<ParticleSystem>();
         anim = GetComponent<Animation>();
@@ -97,12 +101,14 @@ public class Weapon : MonoBehaviourPun
 
     IEnumerator EquipRoutine()
     {
-        state.CanChangeWeapon = false;
-        weaponVisuals.localPosition = equipPosition.localPosition;
+        if (photonView.IsMine)
+            state.CanChangeWeapon = false;
 
+        weaponVisuals.localPosition = equipPosition.localPosition;
         yield return new WaitForSeconds(.4f);
 
-        state.CanChangeWeapon = true;
+        if (photonView.IsMine)
+            state.CanChangeWeapon = true;
     }
 
     #region Shooting
@@ -139,8 +145,12 @@ public class Weapon : MonoBehaviourPun
         RaycastHit hit;
         if (Physics.Raycast(cameraHolder.position, spread, out hit, 100f, 9))
         {
-
             photonView.RPC("NetworkHitEffects", RpcTarget.All, hit.transform.tag == "Player", hit.point, hit.normal);
+
+            if (hit.transform.tag == "Player")
+            {
+                hit.collider.gameObject.GetPhotonView().RPC("TakeDamage", RpcTarget.All, wo.minDamage); // FIX DAMAGE
+            }
         }
     }
 
@@ -205,14 +215,17 @@ public class Weapon : MonoBehaviourPun
     {
         if (!wo.canAim)
             return;
+            
 
         if (Input.GetMouseButton(1) && !IsReloading)
         {
+            state.CanSprint = false;
             IsAiming = true; // REFACTOR MAYBE
             weaponVisuals.position = Vector3.Lerp(weaponVisuals.position, aimPosition.position, Time.deltaTime * wo.aimSpeed);
         }
         else
         {
+            state.CanSprint = true;
             IsAiming = false;
             weaponVisuals.position = Vector3.Lerp(weaponVisuals.position, hipPosition.position, Time.deltaTime * wo.aimSpeed);
         }

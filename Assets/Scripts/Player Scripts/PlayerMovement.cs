@@ -64,7 +64,7 @@ public class PlayerMovement : MonoBehaviour, IPunObservable
         if (controller.isGrounded)
         {
             moveDirection = new Vector3(inputX, 0, inputY).normalized;
-            moveDirection *= movementSpeed;
+            moveDirection *= state.IsAiming ? movementSpeed / 2.5f : movementSpeed;
             moveDirection *= IsSprinting(inputY) ? sprintingMultiplier : 1f;
             moveDirection = transform.TransformDirection(moveDirection);
         }
