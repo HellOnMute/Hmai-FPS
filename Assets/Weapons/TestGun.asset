@@ -34,6 +34,8 @@ MonoBehaviour:
   magSize: 8
   magAmount: 100
   muzzleFlash: {fileID: 0}
+  bulletTrail: {fileID: 120648884187509030, guid: d2ec70c814159504cb3e12e99b00b151,
+    type: 3}
   shootAudio:
   - {fileID: 8300000, guid: 0d9f85d9ea69a734895afc382b692db2, type: 3}
   - {fileID: 8300000, guid: fae95b73a7d8253448ab7311a06badf7, type: 3}

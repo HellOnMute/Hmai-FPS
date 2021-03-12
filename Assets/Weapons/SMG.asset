@@ -30,10 +30,12 @@ MonoBehaviour:
   spreadAddedPerShot: 1.5
   spreadRecoverySpeed: 5
   reloadTime: 2
-  reloadAnimation: {fileID: 0}
+  reloadAnimation: {fileID: 7400000, guid: c32f2f8c1c8ebf346a6831868745f9ae, type: 2}
   magSize: 30
   magAmount: 180
   muzzleFlash: {fileID: 0}
+  bulletTrail: {fileID: 120648884187509030, guid: d2ec70c814159504cb3e12e99b00b151,
+    type: 3}
   shootAudio:
   - {fileID: 8300000, guid: 7628aadaa0631b34ba23c628912e2c94, type: 3}
   - {fileID: 8300000, guid: 7ecfbea2cd6c14f46976064d675deabf, type: 3}

@@ -5,7 +5,7 @@ using UnityEngine;
 using TMPro; // REmove later
 public class PlayerCondition : MonoBehaviourPun
 {
-    float health = 100;
+    int health = 100;
 
     TextMeshProUGUI hptxt;
     TextMeshProUGUI ammotxt;
@@ -28,6 +28,8 @@ public class PlayerCondition : MonoBehaviourPun
 
         hptxt.text = "Health: " + health;
         ammotxt.text = $"{state.CurrentAmmo}/{state.CurrentAmmoReserve}";
+
+        SetPlayerStates();
     }
 
     void SetPlayerStates()
@@ -36,7 +38,7 @@ public class PlayerCondition : MonoBehaviourPun
     }
 
     [PunRPC]
-    public void TakeDamage(float damage)
+    public void TakeDamage(int damage)
     {
         health -= damage;
     }

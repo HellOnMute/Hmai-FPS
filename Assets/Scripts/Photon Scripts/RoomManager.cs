@@ -44,7 +44,7 @@ public class RoomManager : MonoBehaviourPunCallbacks
             Destroy(gameObject);
             return;
         }
-        DontDestroyOnLoad(gameObject);
+        //DontDestroyOnLoad(gameObject);
         Instance = this;
     }
 
@@ -98,8 +98,14 @@ public class RoomManager : MonoBehaviourPunCallbacks
 
     public void JoinedRoom()
     {
+        photonView.RPC("UpdateRoomList", RpcTarget.All);
+    }
+
+    [PunRPC]
+    void UpdateRoomList()
+    {
         Player[] players = PhotonNetwork.PlayerList;
-        
+
         foreach (Transform transform in playerListContent)
         {
             Destroy(transform.gameObject);
@@ -118,7 +124,7 @@ public class RoomManager : MonoBehaviourPunCallbacks
         startGameButton.SetActive(PhotonNetwork.IsMasterClient); // If new host <-
     }
 
-    void SetupRoom() // WIP
+    void SetupRoom()
     {
         var room = Helper.ConvertRoomInfoToDict(PhotonNetwork.CurrentRoom);
 

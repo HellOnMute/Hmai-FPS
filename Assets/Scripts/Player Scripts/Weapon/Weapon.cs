@@ -143,34 +143,42 @@ public class Weapon : MonoBehaviourPun
         photonView.RPC("NetworkShootEffects", RpcTarget.All);
 
         RaycastHit hit;
-        if (Physics.Raycast(cameraHolder.position, spread, out hit, 100f, 9))
+        if (Physics.Raycast(cameraHolder.position, spread, out hit, 150f, 9))
         {
             photonView.RPC("NetworkHitEffects", RpcTarget.All, hit.transform.tag == "Player", hit.point, hit.normal);
 
             if (hit.transform.tag == "Player")
             {
-                hit.collider.gameObject.GetPhotonView().RPC("TakeDamage", RpcTarget.All, wo.minDamage); // FIX DAMAGE
+                int damage = (int)Random.Range(wo.minDamage, wo.maxDamage);
+                hit.collider.gameObject.GetPhotonView().RPC("TakeDamage", RpcTarget.All, damage); // FIX DAMAGE
             }
         }
     }
 
     void CalculateSpreadValue()
     {
-        currentSpread = Mathf.MoveTowards(currentSpread, wo.minSpread, wo.spreadRecoverySpeed * Time.deltaTime);
+        currentSpread = Mathf.MoveTowards(currentSpread, 
+            state.IsMoving ? wo.minSpread * 1.2f : wo.minSpread, 
+            wo.spreadRecoverySpeed * Time.deltaTime);
 
         timeSinceLastShot += Time.deltaTime;
     }
 
     Vector3 CalculateWeaponSpread()
     {
-        var spread = cameraHolder.position + cameraHolder.forward * 100f;
+        var spread = cameraHolder.position + cameraHolder.forward * 150f;
+
+        currentSpread = Mathf.Clamp(
+            currentSpread + wo.spreadAddedPerShot,
+            state.IsMoving ? wo.minSpread * 1.2f : wo.minSpread,    // Add 20% to min spread if moving
+            state.IsAiming ? wo.maxSpread / 1.35f : wo.maxSpread);  // Remove 35% max spread if aiming
+
         spread += Random.Range(-currentSpread, currentSpread) * Vector3.right;
         spread += Random.Range(-currentSpread, currentSpread) * Vector3.up;
         spread -= cameraHolder.position;
-        spread.Normalize();
+        //spread.Normalize();
 
-        currentSpread = Mathf.Clamp(currentSpread + wo.spreadAddedPerShot, wo.minSpread, wo.maxSpread);
-
+        Debug.Log("X: " + (spread.x + 150f) + " Y: " + spread.y);
         return spread;
     }
     #endregion
@@ -220,7 +228,7 @@ public class Weapon : MonoBehaviourPun
         if (Input.GetMouseButton(1) && !IsReloading)
         {
             state.CanSprint = false;
-            IsAiming = true; // REFACTOR MAYBE
+            IsAiming = true;
             weaponVisuals.position = Vector3.Lerp(weaponVisuals.position, aimPosition.position, Time.deltaTime * wo.aimSpeed);
         }
         else
@@ -264,6 +272,12 @@ public class Weapon : MonoBehaviourPun
             GameObject bulletHole = Instantiate(playerHitFXPrefab, hitPoint + hitNormal * 0.001f, Quaternion.identity);
             bulletHole.transform.LookAt(hitPoint + hitNormal);
         }
+
+        GameObject bulletTrailEffect = Instantiate(wo.bulletTrail.gameObject, guntip.position, Quaternion.identity);
+        LineRenderer lr = bulletTrailEffect.GetComponent<LineRenderer>();
+        lr.SetPosition(0, guntip.position);
+        lr.SetPosition(1, hitPoint);
+        Destroy(bulletTrailEffect, 1f); // POOL
     }
 
     #endregion

@@ -118,7 +118,7 @@ public class Launcher : MonoBehaviourPunCallbacks
         MenuManager.Instance.OpenMenu("Loading");
         ChatManager.Instance.DestroyAllChatMessages();
     }
-
+    
     public override void OnRoomListUpdate(List<RoomInfo> roomList)
     {
         RoomManager.Instance.UpdateRoomList(roomList);

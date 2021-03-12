@@ -37,6 +37,7 @@ public class WeaponObject : ScriptableObject
     public int magAmount;
     [Header("Effects")]
     public ParticleSystem muzzleFlash;
+    public LineRenderer bulletTrail;
     [Header("Sound")]
     public AudioClip[] shootAudio;
     public AudioClip[] reloadAudio;
